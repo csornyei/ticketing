@@ -2,7 +2,7 @@ const Index = () => {
     return (
         <div>
             <h1>My Landing page</h1>
-            <button class="btn btn-primary">Sign up!</button>
+            <button className="btn btn-primary">Sign up!</button>
         </div>
     )
 };
