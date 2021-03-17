@@ -4,8 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { User } from "../models/user";
 import { Password } from '../services/password';
-import { BadRequestError } from '../errors/bad-request-error';
-import { validateRequest } from "../middlewares/validate-request";
+import { BadRequestError, validateRequest } from "@csornyei-ticketing/common";
 
 const router = Router();
 
