@@ -2,7 +2,7 @@ import express from 'express';
 import 'express-async-errors';
 import { json } from 'express';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@csornyei-ticketing/common';
+import { errorHandler, NotFoundError, currentUser } from '@csornyei-ticketing/common';
 
 import { CreateTicketRouter } from './routes/new';
 
@@ -14,7 +14,7 @@ app.use(cookieSession({
     signed: false,
     secure: process.env.NODE_ENV !== 'test'
 }));
-
+app.use(currentUser);
 app.use(CreateTicketRouter);
 
 app.all('*', async () => {
