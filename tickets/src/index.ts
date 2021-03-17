@@ -7,7 +7,10 @@ const start = async () => {
         throw new Error('JWT_SECRET_KEY must be defined')
     }
     try {
-        await mongoose.connect('mongodb://ticketing-tickets-mongo-srv:27017/tickets', {
+        if (!process.env.MONGO_URI) {
+            throw new Error('MongoURI must be provided!');
+        }
+        await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useCreateIndex: true

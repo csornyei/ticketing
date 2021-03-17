@@ -21,6 +21,8 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_SECRET_KEY
+            - name: MONGO_URI
+              value: "mongodb://ticketing-tickets-mongo-srv:27017/tickets"
 ---
 apiVersion: v1
 kind: Service
