@@ -1,22 +1,28 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-srv
   labels:
     name: ingress-srv
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-    - host: "ticketing.dev"
+    - host: "ticketing.mate"
       http:
         paths:
           - path: "/api/users/?(.*)"
+            pathType: Prefix
             backend:
-              serviceName: ticketing-auth-srv
-              servicePort: 3000
+              service:
+                name: ticketing-auth-srv
+                port:
+                  number: 3000
           - path: "/?(.*)"
+            pathType: Prefix
             backend:
-              serviceName: ticketing-client-srv
-              servicePort: 3000
+              service:
+                name: ticketing-client-srv
+                port:
+                  number: 3000
