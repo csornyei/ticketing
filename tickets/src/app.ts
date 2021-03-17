@@ -5,6 +5,7 @@ import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError, currentUser } from '@csornyei-ticketing/common';
 
 import { CreateTicketRouter } from './routes/new';
+import { ShowTicketRouter } from './routes/show';
 
 const app = express();
 // express is aware it's behind a proxy and trust it
@@ -16,6 +17,7 @@ app.use(cookieSession({
 }));
 app.use(currentUser);
 app.use(CreateTicketRouter);
+app.use(ShowTicketRouter);
 
 app.all('*', async () => {
     throw new NotFoundError();
