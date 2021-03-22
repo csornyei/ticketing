@@ -5,10 +5,10 @@ deploy:
     manifests:
       - ./infra/k8s/*
 build:
-  local:
-    push: false
+  googleCloudBuild:
+    projectId: celtic-bivouac-308419
   artifacts:
-    - image: matecsornyei/ticketing-auth
+    - image: us.gcr.io/celtic-bivouac-308419/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -16,7 +16,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: matecsornyei/ticketing-tickets
+    - image: us.gcr.io/celtic-bivouac-308419/tickets
       context: tickets
       docker:
         dockerfile: Dockerfile
@@ -24,7 +24,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: matecsornyei/ticketing-client
+    - image: us.gcr.io/celtic-bivouac-308419/client
       context: client
       docker:
         dockerfile: Dockerfile
