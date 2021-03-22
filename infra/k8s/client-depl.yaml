@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ticketing-client
-          image: matecsornyei/ticketing-client
+          image: us.gcr.io/celtic-bivouac-308419/client
 ---
 apiVersion: v1
 kind: Service

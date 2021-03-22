@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ticketing-tickets
-          image: matecsornyei/ticketing-tickets
+          image: us.gcr.io/celtic-bivouac-308419/tickets
           env:
             - name: JWT_SECRET_KEY
               valueFrom:
