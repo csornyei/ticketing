@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+import { natsWrapper } from './nats-wrapper';
 import app from "./app";
 
 const start = async () => {
@@ -7,6 +8,14 @@ const start = async () => {
         throw new Error('JWT_SECRET_KEY must be defined')
     }
     try {
+        await natsWrapper.connect('ticketing', 'abcd', 'http://nats-srv:4222');
+
+        natsWrapper.client.on('close', () => {
+            console.log('NATS connection closed!');
+            process.exit();
+        });
+        process.on("SIGINT", () => natsWrapper.client.close());
+        process.on("SIGTERM", () => natsWrapper.client.close());
         if (!process.env.MONGO_URI) {
             throw new Error('MongoURI must be provided!');
         }
