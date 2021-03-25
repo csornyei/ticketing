@@ -8,7 +8,16 @@ const start = async () => {
         throw new Error('JWT_SECRET_KEY must be defined')
     }
     try {
-        await natsWrapper.connect('ticketing', 'abcd', 'http://nats-srv:4222');
+        if (!process.env.NATS_CLUSTER_ID) {
+            throw new Error('NATS Cluser ID must be provided!');
+        }
+        if (!process.env.NATS_URL) {
+            throw new Error('NATS URL must be provided!');
+        }
+        if (!process.env.NATS_CLIENT_ID) {
+            throw new Error('NATS Client ID must be provided!');
+        }
+        await natsWrapper.connect(process.env.NATS_CLUSTER_ID, process.env.NATS_CLIENT_ID, process.env.NATS_URL);
 
         natsWrapper.client.on('close', () => {
             console.log('NATS connection closed!');
