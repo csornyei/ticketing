@@ -45,7 +45,7 @@ router.post('/api/orders', requireAuth, [
             expiresAt: expiration,
             ticket
         });
-
+        await order.save();
         // Publish an event saying the order was created
 
         res.status(201).send(order);

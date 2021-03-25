@@ -47,13 +47,19 @@ it('reserve a ticket', async () => {
     });
     await ticket.save();
 
-    await request(app)
+    const response = await request(app)
         .post('/api/orders')
         .set('Cookie', global.signin())
         .send({
             ticketId: ticket.id
         })
         .expect(201);
+
+    const savedOrder = await Order.find({});
+
+    expect(savedOrder.length).toEqual(1);
+    const isReserved = await ticket.isReserved();
+    expect(isReserved).toBe(true);
 });
 
 it.todo('emits an order created event')
