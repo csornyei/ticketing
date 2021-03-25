@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../../app';
+import { natsWrapper } from '../../nats-wrapper';
 
 const createTicket = async () => {
     const cookie = global.signin();
@@ -108,5 +109,19 @@ describe('PUT /api/tickets/:id - update a tickets', () => {
 
     })
 
+    it('publish an event', async () => {
+        const { cookie, createResponse } = await createTicket();
+
+        const response = await request(app)
+            .put(`/api/tickets/${createResponse.body.id}`)
+            .set('Cookie', cookie)
+            .send({
+                title: 'new title',
+                price: 50
+            })
+            .expect(200);
+
+        expect(natsWrapper.client.publish).toHaveBeenCalled();
+    });
 
 })

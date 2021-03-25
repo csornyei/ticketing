@@ -8,7 +8,7 @@ import {
     NotAuthorizedError,
 
 } from '@csornyei-ticketing/common';
-import { TicketCreatedPublisher } from '../events/publishers/ticket-created';
+import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated';
 import { natsWrapper } from '../nats-wrapper';
 
 const router = Router();
@@ -45,7 +45,7 @@ router.put('/api/tickets/:id',
         });
 
         await ticket.save();
-        await new TicketCreatedPublisher(natsWrapper.client).publish({
+        await new TicketUpdatedPublisher(natsWrapper.client).publish({
             id: ticket.id,
             title: ticket.title,
             price: ticket.price,
