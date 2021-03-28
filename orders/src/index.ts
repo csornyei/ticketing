@@ -4,6 +4,7 @@ import { natsWrapper } from './nats-wrapper';
 import app from "./app";
 import { TicketCreatedListener } from './events/listeners/ticket-created';
 import { TicketUpdatedListener } from './events/listeners/ticket-updated';
+import { ExpirationCompleteListener } from './events/listeners/expiration-complete';
 
 const start = async () => {
     if (!process.env.JWT_SECRET_KEY) {
@@ -30,6 +31,7 @@ const start = async () => {
 
         new TicketCreatedListener(natsWrapper.client).listen();
         new TicketUpdatedListener(natsWrapper.client).listen();
+        new ExpirationCompleteListener(natsWrapper.client).listen();
 
         if (!process.env.MONGO_URI) {
             throw new Error('MongoURI must be provided!');

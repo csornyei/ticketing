@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import { TicketUpdatedEvent } from "@csornyei-ticketing/common";
 
-
 import { natsWrapper } from '../../../nats-wrapper';
 import { Ticket } from '../../../models/ticket';
 import { TicketUpdatedListener } from '../ticket-updated';
