@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../../app';
+import Ticket from '../../models/ticket';
 import { natsWrapper } from '../../nats-wrapper';
 
 const createTicket = async () => {
@@ -16,19 +17,6 @@ const createTicket = async () => {
 }
 
 describe('PUT /api/tickets/:id - update a tickets', () => {
-    it('returns a 404 if the id not exist', async () => {
-        const id = new mongoose.Types.ObjectId().toHexString();
-        const response = await request(app)
-            .put(`/api/tickets/${id}`)
-            .set('Cookie', global.signin())
-            .send({
-                title: 'abcd',
-                price: 20
-            });
-
-        expect(response.status).toEqual(404);
-    });
-
     describe('authorization', () => {
         it('returns a 401 if the user is not signed in', async () => {
             const id = new mongoose.Types.ObjectId().toHexString();
@@ -60,6 +48,19 @@ describe('PUT /api/tickets/:id - update a tickets', () => {
     });
 
     describe('input validation', () => {
+        it('returns a 404 if the id not exist', async () => {
+            const id = new mongoose.Types.ObjectId().toHexString();
+            const response = await request(app)
+                .put(`/api/tickets/${id}`)
+                .set('Cookie', global.signin())
+                .send({
+                    title: 'abcd',
+                    price: 20
+                });
+
+            expect(response.status).toEqual(404);
+        });
+
         it('return a 400 on invalid parameters', async () => {
             const { cookie, createResponse } = await createTicket();
 
@@ -81,7 +82,7 @@ describe('PUT /api/tickets/:id - update a tickets', () => {
                 })
                 .expect(400);
         });
-    })
+    });
 
     describe('updates the ticket', () => {
         it('returns the ticket on success', async () => {
@@ -107,21 +108,41 @@ describe('PUT /api/tickets/:id - update a tickets', () => {
             expect(updatedResponse.body.price).toEqual(50);
         });
 
-    })
-
-    it('publish an event', async () => {
-        const { cookie, createResponse } = await createTicket();
-
-        const response = await request(app)
-            .put(`/api/tickets/${createResponse.body.id}`)
-            .set('Cookie', cookie)
-            .send({
-                title: 'new title',
-                price: 50
-            })
-            .expect(200);
-
-        expect(natsWrapper.client.publish).toHaveBeenCalled();
     });
+
+    describe('cross service related tests', () => {
+        it('publish an event', async () => {
+            const { cookie, createResponse } = await createTicket();
+
+            const response = await request(app)
+                .put(`/api/tickets/${createResponse.body.id}`)
+                .set('Cookie', cookie)
+                .send({
+                    title: 'new title',
+                    price: 50
+                })
+                .expect(200);
+
+            expect(natsWrapper.client.publish).toHaveBeenCalled();
+        });
+
+        it('rejects an update if ticket is reserved', async () => {
+            const { cookie, createResponse } = await createTicket();
+
+            const ticket = await Ticket.findById(createResponse.body.id);
+            ticket!.set({ orderId: mongoose.Types.ObjectId().toHexString() });
+            await ticket!.save()
+
+            await request(app)
+                .put(`/api/tickets/${createResponse.body.id}`)
+                .set('Cookie', cookie)
+                .send({
+                    title: 'new title',
+                    price: 50
+                })
+                .expect(400);
+        });
+    });
+
 
 })
