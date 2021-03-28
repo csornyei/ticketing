@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 
 import { natsWrapper } from './nats-wrapper';
 import app from "./app";
+import { OrderCreatedListener } from './events/listeners/order-created';
+import { OrderCancelledListener } from './events/listeners/order-cancelled';
 
 const start = async () => {
     if (!process.env.JWT_SECRET_KEY) {
@@ -25,6 +27,9 @@ const start = async () => {
         });
         process.on("SIGINT", () => natsWrapper.client.close());
         process.on("SIGTERM", () => natsWrapper.client.close());
+
+        new OrderCreatedListener(natsWrapper.client).listen();
+        new OrderCancelledListener(natsWrapper.client).listen();
         if (!process.env.MONGO_URI) {
             throw new Error('MongoURI must be provided!');
         }
