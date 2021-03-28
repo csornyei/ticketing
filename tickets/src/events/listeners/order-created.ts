@@ -3,6 +3,7 @@ import { Listener, OrderCreatedEvent, Subjects } from '@csornyei-ticketing/commo
 
 import { queueGroupName } from './queue-group-name';
 import Ticket from '../../models/ticket';
+import { TicketUpdatedPublisher } from '../publishers/ticket-updated';
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
     readonly subject = Subjects.OrderCreated;
@@ -17,6 +18,15 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
 
         ticket.set({ orderId: data.id });
         await ticket.save();
+
+        await new TicketUpdatedPublisher(this.client).publish({
+            id: ticket.id,
+            title: ticket.title,
+            price: ticket.price,
+            userId: ticket.userId,
+            version: ticket.version,
+            orderId: ticket.orderId
+        });
 
         msg.ack();
     }
